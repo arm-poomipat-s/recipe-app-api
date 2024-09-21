@@ -23,6 +23,9 @@ ARG DEV=false
 # Create virtual environment and install dependencies
 RUN python -m venv /py && \
     /py/bin/pip install --upgrade pip && \
+    apk add --update --no-cache postgresql-client && \
+    apk add --update --no--cache --virtual .tmp-build-deps \
+        build-base postgresql-dev musl-dev && \
     /py/bin/pip install -r /tmp/requirements.txt
 
 # Install development dependencies if ARG DEV is true
@@ -32,6 +35,7 @@ RUN if [ "$DEV" = "true" ]; then \
 
 # Clean up /tmp directory and create a non-root user
 RUN rm -rf /tmp && \
+    apk del .tmp-build-deps && \
     adduser \
     --disabled-password \
     --no-create-home \
